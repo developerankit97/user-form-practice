@@ -29,9 +29,9 @@ function storeTaskInLocalStorage(name, email) {
         users = JSON.parse(localStorage.getItem('users'));
         console.log(users);
     }
-    console.log();
     let user = {};
-    users.push(user[name] = email);
+    user[name] = email;
+    users.push(user);
     localStorage.setItem('users', JSON.stringify(users));
 }
 
