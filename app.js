@@ -4,9 +4,10 @@ let email = document.querySelector('#email');
 let list = document.querySelector('.items');
 
 
-btn.addEventListener("click", addTask);
+btn.addEventListener("click", addUser);
 document.addEventListener('DOMContentLoaded', getTasks);
 list.addEventListener('click', deleteUser);
+list.addEventListener('click', editUser);
 
 function getTasks() {
     let users;
@@ -21,26 +22,22 @@ function getTasks() {
         li.className = 'item';
         li.appendChild(document.createTextNode(`${user.name} ${user.email}`));
         list.appendChild(li);
-        const link = document.createElement('a');
-        link.appendChild(document.createTextNode('❌'));
-        link.className = 'delete';
-        li.appendChild(link);
+        const edit = document.createElement('a');
+        edit.appendChild(document.createTextNode('🖋'));
+        edit.className = 'edit';
+        li.appendChild(edit);
+        const deleteIcon = document.createElement('a');
+        deleteIcon.appendChild(document.createTextNode('❌'));
+        deleteIcon.className = 'delete';
+        li.appendChild(deleteIcon);
         list.appendChild(li);
     });
 }
 
-function addTask(e) {
-    e.preventDefault();
+function addUser(e) {
     if (firstName.value === '' && email.value === '') {
         alert('Enter name and email');
     } else {
-        const li = document.createElement('li');
-        li.className = 'item';
-        li.appendChild(document.createTextNode(`${firstName.value} ${email.value}`));
-        const link = document.createElement('a');
-        link.appendChild(document.createTextNode('❌'));
-        li.appendChild(link);
-        list.appendChild(li);
         storeTaskInLocalStorage(firstName.value, email.value);
         firstName.value = '';
         email.value = '';
@@ -54,14 +51,25 @@ function storeTaskInLocalStorage(name, email) {
     } else {
         users = JSON.parse(localStorage.getItem('users'));
     }
-    let user = {};
-    user['name'] = name;
-    user['email'] = email;
-    users.push(user);
+
+    let isupdate = true;
+    users.forEach(user => {
+        if (name == user.name || email == user.email) {
+            user.name = name;
+            user.email = email;
+            isupdate = false;
+        }
+    })
+    if (isupdate) {
+        let user = {};
+        user['name'] = name;
+        user['email'] = email;
+        users.push(user);
+    }
     localStorage.setItem('users', JSON.stringify(users));
 }
 
-function deleteUser(e){
+function deleteUser(e) {
     if (e.target.classList.contains('delete')) {
         e.target.parentElement.remove();
         removeUserFromLocalStorage(e.target.parentElement);
@@ -81,3 +89,23 @@ function removeUserFromLocalStorage(useritem) {
     localStorage.setItem('users', JSON.stringify(users));
 }
 
+function editUser(e) {
+    if (e.target.classList.contains('edit')) {
+        editUserInLocalStorage(e.target.parentElement);
+    }
+}
+
+function editUserInLocalStorage(useritem) {
+    let users;
+    if (localStorage.getItem('users') === null) {
+        users = [];
+    } else {
+        users = JSON.parse(localStorage.getItem('users'));
+    }
+    users.forEach(user => {
+        if (useritem.textContent.split(' ')[0] == user.name) {
+            firstName.value = user.name;
+            email.value = user.email;
+        }
+    })
+}
