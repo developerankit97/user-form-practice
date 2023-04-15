@@ -5,6 +5,29 @@ let list = document.querySelector('.items');
 
 
 btn.addEventListener("click", addTask);
+document.addEventListener('DOMContentLoaded', getTasks);
+list.addEventListener('click', deleteUser);
+
+function getTasks() {
+    let users;
+    if (localStorage.getItem('users') === null) {
+        users = [];
+    } else {
+        users = JSON.parse(localStorage.getItem('users'));
+    }
+
+    users.forEach(user => {
+        const li = document.createElement('li');
+        li.className = 'item';
+        li.appendChild(document.createTextNode(`${user.name} ${user.email}`));
+        list.appendChild(li);
+        const link = document.createElement('a');
+        link.appendChild(document.createTextNode('❌'));
+        link.className = 'delete';
+        li.appendChild(link);
+        list.appendChild(li);
+    });
+}
 
 function addTask(e) {
     e.preventDefault();
@@ -14,6 +37,9 @@ function addTask(e) {
         const li = document.createElement('li');
         li.className = 'item';
         li.appendChild(document.createTextNode(`${firstName.value} ${email.value}`));
+        const link = document.createElement('a');
+        link.appendChild(document.createTextNode('❌'));
+        li.appendChild(link);
         list.appendChild(li);
         storeTaskInLocalStorage(firstName.value, email.value);
         firstName.value = '';
@@ -27,12 +53,31 @@ function storeTaskInLocalStorage(name, email) {
         users = [];
     } else {
         users = JSON.parse(localStorage.getItem('users'));
-        console.log(users);
     }
     let user = {};
-    user[name] = email;
+    user['name'] = name;
+    user['email'] = email;
     users.push(user);
     localStorage.setItem('users', JSON.stringify(users));
 }
 
+function deleteUser(e){
+    if (e.target.classList.contains('delete')) {
+        e.target.parentElement.remove();
+        removeUserFromLocalStorage(e.target.parentElement);
+    }
+}
+
+function removeUserFromLocalStorage(useritem) {
+    let users;
+    if (localStorage.getItem('users') === null) {
+        users = [];
+    } else {
+        users = JSON.parse(localStorage.getItem('users'));
+    }
+    users = users.filter(user => {
+        return (useritem.textContent.split(' ')[0] !== user.name);
+    });
+    localStorage.setItem('users', JSON.stringify(users));
+}
 
