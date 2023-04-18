@@ -35,9 +35,19 @@ function getTasks() {
 }
 
 function addUser(e) {
+    e.preventDefault();
     if (firstName.value === '' && email.value === '') {
         alert('Enter name and email');
     } else {
+        const obj = {
+            "name": firstName.value,
+            "email": email.value
+        }
+        console.log(JSON.stringify(obj));
+        axios
+            .post('https://crudcrud.com/api/84ff72b3580c450087c088d3e29236af/users', obj)
+            .then(res => console.log(res))
+            .catch(err => console.log(err));
         storeTaskInLocalStorage(firstName.value, email.value);
         firstName.value = '';
         email.value = '';
